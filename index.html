@@ -3,25 +3,171 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mystery Box - Premium Demo</title>
+    <title>Carp Life Mystery Box Competition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles/style.css" />
   </head>
   <body>
-    <div class="header">
-      <h1>⚡ MYSTERY BOX ⚡</h1>
-      <p>Choose Your Prize!</p>
+    <!-- Competition Header -->
+    <header class="comp-header">
+      <div class="comp-info">
+        <h1 class="comp-title" id="compTitle">CARP LIFE MYSTERY BOX</h1>
+        <p class="comp-date" id="compDate">COMPETITION DATE</p>
+      </div>
+      <div class="header-controls">
+        <button class="header-btn" id="prizeListBtn">📋 PRIZE LIST</button>
+        <button class="header-btn" id="settingsBtn">⚙️ SETUP</button>
+      </div>
+    </header>
+
+    <!-- Main Game Area -->
+    <main class="game-container">
+      <div class="page-indicator" id="pageIndicator">
+        <span class="page-info"
+          >Page <span id="currentPage">1</span> of
+          <span id="totalPages">1</span></span
+        >
+        <span class="box-range">Boxes <span id="boxRange">1-20</span></span>
+      </div>
+
+      <div class="boxes-grid" id="boxesGrid"></div>
+
+      <div class="pagination-controls" id="paginationControls">
+        <button class="page-btn" id="prevPage">◀ PREV</button>
+        <div class="page-dots" id="pageDots"></div>
+        <button class="page-btn" id="nextPage">NEXT ▶</button>
+      </div>
+
+      <div class="game-controls">
+        <button class="control-btn reset-btn" id="resetBtn">
+          🔄 RESET COMPETITION
+        </button>
+      </div>
+    </main>
+
+    <!-- Setup Modal -->
+    <div class="modal" id="setupModal">
+      <div class="modal-content setup-modal">
+        <div class="modal-header">
+          <h2>⚙️ Competition Setup</h2>
+          <button class="close-btn" data-modal="setupModal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="setup-section">
+            <label for="compNameInput">Competition Name:</label>
+            <input
+              type="text"
+              id="compNameInput"
+              placeholder="e.g., CARP LIFE MYSTERY BOX"
+              value="CARP LIFE MYSTERY BOX"
+            />
+          </div>
+
+          <div class="setup-section">
+            <label for="compDateInput">Competition Date:</label>
+            <input
+              type="text"
+              id="compDateInput"
+              placeholder="e.g., Saturday 1st February 2026"
+              value=""
+            />
+          </div>
+
+          <div class="setup-section">
+            <label for="suspenseTime">Suspense Duration (seconds):</label>
+            <div class="slider-container">
+              <input
+                type="range"
+                id="suspenseTime"
+                min="1"
+                max="5"
+                step="0.5"
+                value="2"
+              />
+              <span class="slider-value" id="suspenseValue">2.0s</span>
+            </div>
+          </div>
+
+          <div class="setup-section">
+            <label for="boxesPerPage">Boxes Per Page:</label>
+            <select id="boxesPerPage">
+              <option value="20">20 boxes</option>
+              <option value="25">25 boxes</option>
+              <option value="30">30 boxes</option>
+            </select>
+          </div>
+
+          <div class="setup-section">
+            <label for="csvUpload">Upload Prize CSV:</label>
+            <input type="file" id="csvUpload" accept=".csv" />
+            <p class="help-text">
+              CSV should have columns: prize_name, prize_value
+            </p>
+          </div>
+
+          <div class="setup-section">
+            <label>
+              <input type="checkbox" id="soundEnabled" checked />
+              Enable Sound Effects
+            </label>
+          </div>
+
+          <button class="primary-btn" id="saveSetup">SAVE & START</button>
+        </div>
+      </div>
     </div>
 
-    <div class="boxes-container" id="boxesContainer"></div>
-
-    <div class="controls">
-      <button class="reset-btn" onclick="resetGame()">🔄 RESET</button>
+    <!-- Prize List Modal -->
+    <div class="modal" id="prizeListModal">
+      <div class="modal-content prize-list-modal">
+        <div class="modal-header">
+          <h2>📋 Prize List & Transparency</h2>
+          <button class="close-btn" data-modal="prizeListModal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="prize-stats">
+            <div class="stat-box">
+              <span class="stat-label">Total Prizes</span>
+              <span class="stat-value" id="totalPrizes">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Claimed</span>
+              <span class="stat-value claimed" id="claimedPrizes">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Remaining</span>
+              <span class="stat-value remaining" id="remainingPrizes">0</span>
+            </div>
+          </div>
+          <div class="prize-list-container" id="prizeListContainer"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="prize-overlay" id="prizeOverlay">
-      <div class="prize-content" id="prizeContent"></div>
+    <!-- Prize Reveal Modal -->
+    <div class="modal prize-reveal-modal" id="prizeRevealModal">
+      <div class="modal-content reveal-content">
+        <div class="reveal-animation">
+          <div class="prize-icon-reveal" id="prizeIcon">
+            <img src="./images/gift-box.png" alt="Prize" />
+          </div>
+          <div class="prize-details">
+            <h3 class="prize-name" id="prizeName">GRAND PRIZE!</h3>
+            <div class="prize-value" id="prizeValue">£500</div>
+            <div class="box-number-reveal">
+              Box #<span id="revealBoxNumber">1</span>
+            </div>
+          </div>
+          <button class="close-reveal-btn" id="closeReveal">CONTINUE</button>
+        </div>
+      </div>
     </div>
 
-    <script src="./game.js"></script>
+    <script src="game.js"></script>
   </body>
 </html>
