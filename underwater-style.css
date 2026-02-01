@@ -66,13 +66,11 @@ body::after {
   height: 100%;
   background-image: radial-gradient(
       circle,
-      rgba(255, 255, 255, 0.6) 2px,
+      rgba(255, 255, 255, 0.5) 2px,
       transparent 2px
     ),
-    radial-gradient(circle, rgba(0, 212, 170, 0.4) 3px, transparent 3px),
-    radial-gradient(circle, rgba(255, 215, 0, 0.3) 2.5px, transparent 2.5px),
-    radial-gradient(circle, rgba(240, 248, 255, 0.5) 1.5px, transparent 1.5px);
-  background-size: 250px 350px, 180px 280px, 200px 320px, 150px 250px;
+    radial-gradient(circle, rgba(0, 212, 170, 0.3) 2.5px, transparent 2.5px);
+  background-size: 250px 350px, 200px 320px;
   animation: floatingBubbles 80s linear infinite;
   will-change: transform;
   pointer-events: none;
@@ -494,9 +492,10 @@ body::after {
   }
 }
 
-/* ULTRA INTENSE SUSPENSE - Earthquake shake with 3D rotation */
+/* SUSPENSE - Wobble + Pulse anticipation */
 .mystery-box.suspense {
-  animation: earthquakeShake 0.12s ease-in-out infinite;
+  animation: suspenseWobble 0.6s ease-in-out infinite;
+  will-change: transform;
   z-index: 100;
 }
 
@@ -504,89 +503,57 @@ body::after {
   border-color: var(--treasure-gold);
   box-shadow: 0 0 40px rgba(255, 215, 0, 1), 0 0 80px rgba(255, 215, 0, 0.6),
     0 0 120px rgba(255, 215, 0, 0.4), inset 0 0 40px rgba(255, 215, 0, 0.3);
-  animation: suspenseGlow 0.3s ease-in-out infinite;
+  animation: suspenseGlow 1s ease-in-out infinite;
 }
 
-@keyframes earthquakeShake {
-  0% {
-    transform: translate(0, 0) rotate(0deg) rotateY(0deg);
+@keyframes suspenseWobble {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
   }
-  10% {
-    transform: translate(-12px, -10px) rotate(-3deg) rotateY(-8deg);
-  }
-  20% {
-    transform: translate(10px, -8px) rotate(2deg) rotateY(5deg);
+  15% {
+    transform: rotate(-3deg) scale(1.04);
   }
   30% {
-    transform: translate(-10px, 12px) rotate(-2deg) rotateY(-6deg);
+    transform: rotate(2.5deg) scale(0.98);
   }
-  40% {
-    transform: translate(8px, -10px) rotate(3deg) rotateY(7deg);
-  }
-  50% {
-    transform: translate(-8px, 8px) rotate(-2deg) rotateY(-5deg);
+  45% {
+    transform: rotate(-2deg) scale(1.06);
   }
   60% {
-    transform: translate(12px, -6px) rotate(2deg) rotateY(6deg);
+    transform: rotate(1.5deg) scale(0.97);
   }
-  70% {
-    transform: translate(-6px, 10px) rotate(-3deg) rotateY(-7deg);
-  }
-  80% {
-    transform: translate(10px, -12px) rotate(2deg) rotateY(5deg);
+  75% {
+    transform: rotate(-1deg) scale(1.08);
   }
   90% {
-    transform: translate(-12px, 6px) rotate(-2deg) rotateY(-6deg);
-  }
-  100% {
-    transform: translate(0, 0) rotate(0deg) rotateY(0deg);
+    transform: rotate(0.5deg) scale(1.02);
   }
 }
 
 @keyframes suspenseGlow {
-  0%,
-  100% {
-    filter: brightness(1.2) saturate(150%);
+  0%, 100% {
     border-color: rgba(255, 215, 0, 0.8);
   }
   50% {
-    filter: brightness(1.8) saturate(200%);
     border-color: rgba(255, 215, 0, 1);
   }
 }
 
 .mystery-box.suspense .box-icon {
-  animation: treasureVibrate 0.1s ease-in-out infinite,
-    treasureWiggle 0.2s ease-in-out infinite;
+  animation: treasureRock 0.4s ease-in-out infinite;
+  will-change: transform;
   filter: drop-shadow(0 0 30px rgba(255, 215, 0, 1));
 }
 
-@keyframes treasureVibrate {
-  0%,
-  100% {
-    transform: translateX(0) scale(1);
+@keyframes treasureRock {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
   }
   25% {
-    transform: translateX(-8px) scale(1.1) rotate(-5deg);
-  }
-  50% {
-    transform: translateX(0) scale(0.95);
+    transform: rotate(-8deg) scale(1.08);
   }
   75% {
-    transform: translateX(8px) scale(1.1) rotate(5deg);
-  }
-}
-
-@keyframes treasureWiggle {
-  0%,
-  100% {
-    transform: rotateZ(0deg);
-  }
-  25% {
-    transform: rotateZ(-10deg);
-  }
-  75% {
-    transform: rotateZ(10deg);
+    transform: rotate(8deg) scale(1.08);
   }
 }
 
@@ -1621,16 +1588,17 @@ body::after {
   }
 }
 
-/* Swimming fish */
+/* Swimming fish - GPU composited via transform only */
 .swimming-fish {
   position: fixed;
+  left: 0;
   pointer-events: none;
   z-index: 0;
   font-size: 1.5rem;
   opacity: 0.6;
-  filter: drop-shadow(0 0 6px rgba(0, 212, 170, 0.4));
+  will-change: transform;
   animation-timing-function: linear;
-  animation-iteration-count: infinite;
+  animation-fill-mode: forwards;
 }
 
 .swimming-fish.left-to-right {
@@ -1639,46 +1607,41 @@ body::after {
 
 .swimming-fish.right-to-left {
   animation-name: swimRightToLeft;
-  transform: scaleX(-1);
 }
 
 @keyframes swimLeftToRight {
   0% {
-    left: -60px;
-    transform: scaleX(1) translateY(0);
+    transform: translateX(-60px) translateY(0);
   }
   25% {
-    transform: scaleX(1) translateY(-15px);
+    transform: translateX(calc(25vw - 15px)) translateY(-15px);
   }
   50% {
-    transform: scaleX(1) translateY(5px);
+    transform: translateX(calc(50vw + 5px)) translateY(5px);
   }
   75% {
-    transform: scaleX(1) translateY(-10px);
+    transform: translateX(calc(75vw - 10px)) translateY(-10px);
   }
   100% {
-    left: calc(100vw + 60px);
-    transform: scaleX(1) translateY(0);
+    transform: translateX(calc(100vw + 60px)) translateY(0);
   }
 }
 
 @keyframes swimRightToLeft {
   0% {
-    right: -60px;
-    transform: scaleX(-1) translateY(0);
+    transform: translateX(calc(100vw + 60px)) scaleX(-1) translateY(0);
   }
   25% {
-    transform: scaleX(-1) translateY(-12px);
+    transform: translateX(75vw) scaleX(-1) translateY(-12px);
   }
   50% {
-    transform: scaleX(-1) translateY(8px);
+    transform: translateX(50vw) scaleX(-1) translateY(8px);
   }
   75% {
-    transform: scaleX(-1) translateY(-10px);
+    transform: translateX(25vw) scaleX(-1) translateY(-10px);
   }
   100% {
-    right: calc(100vw + 60px);
-    transform: scaleX(-1) translateY(0);
+    transform: translateX(-60px) scaleX(-1) translateY(0);
   }
 }
 

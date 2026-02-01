@@ -719,9 +719,13 @@ class UnderwaterTreasureGame {
 
   spawnFish() {
     const fishTypes = ["🐟", "🐠", "🐡", "🦈", "🐙", "🦑", "🦐", "🐚"];
-    const fishCount = 12;
+    const maxFish = 3;
+    let activeFish = 0;
 
-    const createFish = () => {
+    const createFish = (initialDelay) => {
+      if (activeFish >= maxFish) return;
+      activeFish++;
+
       const fish = document.createElement("div");
       fish.className = "swimming-fish";
 
@@ -733,21 +737,24 @@ class UnderwaterTreasureGame {
       fish.style.fontSize = (1 + Math.random() * 1.5) + "rem";
       fish.style.opacity = 0.3 + Math.random() * 0.4;
 
-      const duration = 15 + Math.random() * 25;
+      const duration = 18 + Math.random() * 22;
       fish.style.animationDuration = duration + "s";
-      fish.style.animationDelay = Math.random() * 10 + "s";
+      fish.style.animationDelay = (initialDelay || 0) + "s";
+
+      // Remove from DOM when animation ends, then spawn a replacement
+      fish.addEventListener("animationend", () => {
+        fish.remove();
+        activeFish--;
+        // Spawn a replacement after a random pause
+        setTimeout(() => createFish(0), 2000 + Math.random() * 6000);
+      });
 
       document.body.appendChild(fish);
     };
 
-    for (let i = 0; i < fishCount; i++) {
-      createFish();
+    for (let i = 0; i < maxFish; i++) {
+      createFish(Math.random() * 10);
     }
-
-    // Continuously spawn new fish
-    setInterval(() => {
-      createFish();
-    }, 8000);
   }
 
   createSineWaves() {
@@ -758,17 +765,13 @@ class UnderwaterTreasureGame {
     const ctx = canvas.getContext("2d");
 
     const waves = [
-      { amplitude: 25, frequency: 0.008, speed: 0.0015, color: "rgba(0, 102, 204, 0.45)", lineWidth: 2 },
-      { amplitude: 18, frequency: 0.012, speed: -0.002, color: "rgba(0, 212, 170, 0.4)", lineWidth: 1.5 },
-      { amplitude: 30, frequency: 0.006, speed: 0.0012, color: "rgba(32, 178, 170, 0.35)", lineWidth: 2.5 },
-      { amplitude: 15, frequency: 0.015, speed: -0.0025, color: "rgba(0, 150, 200, 0.35)", lineWidth: 1.5 },
-      { amplitude: 22, frequency: 0.01, speed: 0.0018, color: "rgba(0, 80, 160, 0.3)", lineWidth: 2 },
-      { amplitude: 12, frequency: 0.02, speed: -0.0012, color: "rgba(0, 200, 170, 0.3)", lineWidth: 1 },
-      { amplitude: 35, frequency: 0.005, speed: 0.0008, color: "rgba(0, 60, 120, 0.25)", lineWidth: 3 },
+      { amplitude: 28, frequency: 0.007, speed: 0.0012, color: "rgba(0, 102, 204, 0.4)", lineWidth: 2 },
+      { amplitude: 35, frequency: 0.005, speed: 0.0008, color: "rgba(0, 60, 120, 0.25)", lineWidth: 2.5 },
     ];
 
     let lastTime = 0;
     let elapsed = 0;
+    const frameInterval = 50; // ~20fps
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -778,14 +781,21 @@ class UnderwaterTreasureGame {
     window.addEventListener("resize", resize);
 
     const animate = (timestamp) => {
+      requestAnimationFrame(animate);
+
       if (!lastTime) lastTime = timestamp;
       const delta = timestamp - lastTime;
+
+      // Throttle to ~30fps — waves are slow, 60fps is unnecessary
+      if (delta < frameInterval) return;
+
       lastTime = timestamp;
       elapsed += delta;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const spacing = canvas.height / (waves.length + 1);
+      const step = 6;
 
       waves.forEach((wave, i) => {
         const baseY = spacing * (i + 1);
@@ -794,7 +804,7 @@ class UnderwaterTreasureGame {
         ctx.strokeStyle = wave.color;
         ctx.lineWidth = wave.lineWidth;
 
-        for (let x = 0; x <= canvas.width; x += 2) {
+        for (let x = 0; x <= canvas.width; x += step) {
           const y = baseY + Math.sin(x * wave.frequency + elapsed * wave.speed) * wave.amplitude;
           if (x === 0) {
             ctx.moveTo(x, y);
@@ -804,8 +814,6 @@ class UnderwaterTreasureGame {
         }
         ctx.stroke();
       });
-
-      requestAnimationFrame(animate);
     };
 
     requestAnimationFrame(animate);
