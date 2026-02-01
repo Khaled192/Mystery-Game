@@ -74,6 +74,7 @@ body::after {
     radial-gradient(circle, rgba(240, 248, 255, 0.5) 1.5px, transparent 1.5px);
   background-size: 250px 350px, 180px 280px, 200px 320px, 150px 250px;
   animation: floatingBubbles 80s linear infinite;
+  will-change: transform;
   pointer-events: none;
   z-index: 0;
 }

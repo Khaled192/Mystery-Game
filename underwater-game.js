@@ -758,16 +758,17 @@ class UnderwaterTreasureGame {
     const ctx = canvas.getContext("2d");
 
     const waves = [
-      { amplitude: 25, frequency: 0.008, speed: 0.004, color: "rgba(0, 102, 204, 0.45)", lineWidth: 2 },
-      { amplitude: 18, frequency: 0.012, speed: -0.005, color: "rgba(0, 212, 170, 0.4)", lineWidth: 1.5 },
-      { amplitude: 30, frequency: 0.006, speed: 0.003, color: "rgba(32, 178, 170, 0.35)", lineWidth: 2.5 },
-      { amplitude: 15, frequency: 0.015, speed: -0.006, color: "rgba(0, 150, 200, 0.35)", lineWidth: 1.5 },
-      { amplitude: 22, frequency: 0.01, speed: 0.0045, color: "rgba(0, 80, 160, 0.3)", lineWidth: 2 },
-      { amplitude: 12, frequency: 0.02, speed: -0.003, color: "rgba(0, 200, 170, 0.3)", lineWidth: 1 },
-      { amplitude: 35, frequency: 0.005, speed: 0.002, color: "rgba(0, 60, 120, 0.25)", lineWidth: 3 },
+      { amplitude: 25, frequency: 0.008, speed: 0.0015, color: "rgba(0, 102, 204, 0.45)", lineWidth: 2 },
+      { amplitude: 18, frequency: 0.012, speed: -0.002, color: "rgba(0, 212, 170, 0.4)", lineWidth: 1.5 },
+      { amplitude: 30, frequency: 0.006, speed: 0.0012, color: "rgba(32, 178, 170, 0.35)", lineWidth: 2.5 },
+      { amplitude: 15, frequency: 0.015, speed: -0.0025, color: "rgba(0, 150, 200, 0.35)", lineWidth: 1.5 },
+      { amplitude: 22, frequency: 0.01, speed: 0.0018, color: "rgba(0, 80, 160, 0.3)", lineWidth: 2 },
+      { amplitude: 12, frequency: 0.02, speed: -0.0012, color: "rgba(0, 200, 170, 0.3)", lineWidth: 1 },
+      { amplitude: 35, frequency: 0.005, speed: 0.0008, color: "rgba(0, 60, 120, 0.25)", lineWidth: 3 },
     ];
 
-    let time = 0;
+    let lastTime = 0;
+    let elapsed = 0;
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -776,7 +777,12 @@ class UnderwaterTreasureGame {
     resize();
     window.addEventListener("resize", resize);
 
-    const animate = () => {
+    const animate = (timestamp) => {
+      if (!lastTime) lastTime = timestamp;
+      const delta = timestamp - lastTime;
+      lastTime = timestamp;
+      elapsed += delta;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const spacing = canvas.height / (waves.length + 1);
@@ -789,7 +795,7 @@ class UnderwaterTreasureGame {
         ctx.lineWidth = wave.lineWidth;
 
         for (let x = 0; x <= canvas.width; x += 2) {
-          const y = baseY + Math.sin(x * wave.frequency + time * wave.speed * 60) * wave.amplitude;
+          const y = baseY + Math.sin(x * wave.frequency + elapsed * wave.speed) * wave.amplitude;
           if (x === 0) {
             ctx.moveTo(x, y);
           } else {
@@ -799,11 +805,10 @@ class UnderwaterTreasureGame {
         ctx.stroke();
       });
 
-      time++;
       requestAnimationFrame(animate);
     };
 
-    animate();
+    requestAnimationFrame(animate);
   }
 
   updatePrizeList() {
