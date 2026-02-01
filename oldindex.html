@@ -3,25 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Deep Sea Treasure Hunt</title>
+    <title>Carp Life Mystery Box Competition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./underwater-style.css" />
+    <link rel="stylesheet" href="./styles/style.css" />
   </head>
   <body>
     <!-- Competition Header -->
     <header class="comp-header">
       <div class="comp-info">
-        <h1 class="comp-title" id="compTitle">DEEP SEA TREASURE HUNT</h1>
+        <h1 class="comp-title" id="compTitle">CARP LIFE MYSTERY BOX</h1>
         <p class="comp-date" id="compDate">COMPETITION DATE</p>
       </div>
       <div class="header-controls">
-        <button class="header-btn" id="prizeListBtn">🐠 TREASURE MAP</button>
-        <button class="header-btn" id="settingsBtn">⚙️ DIVE SETUP</button>
+        <button class="header-btn" id="prizeListBtn">📋 PRIZE LIST</button>
+        <button class="header-btn" id="settingsBtn">⚙️ SETUP</button>
       </div>
     </header>
 
@@ -29,10 +29,10 @@
     <main class="game-container">
       <div class="page-indicator" id="pageIndicator">
         <span class="page-info"
-          >Zone <span id="currentPage">1</span> of
+          >Page <span id="currentPage">1</span> of
           <span id="totalPages">1</span></span
         >
-        <span class="box-range">Chests <span id="boxRange">1-20</span></span>
+        <span class="box-range">Boxes <span id="boxRange">1-20</span></span>
       </div>
 
       <div class="boxes-grid" id="boxesGrid"></div>
@@ -45,7 +45,7 @@
 
       <div class="game-controls">
         <button class="control-btn reset-btn" id="resetBtn">
-          🔄 RESET DIVE
+          🔄 RESET COMPETITION
         </button>
       </div>
     </main>
@@ -54,22 +54,22 @@
     <div class="modal" id="setupModal">
       <div class="modal-content setup-modal">
         <div class="modal-header">
-          <h2>⚙️ Dive Setup</h2>
+          <h2>⚙️ Competition Setup</h2>
           <button class="close-btn" data-modal="setupModal">✕</button>
         </div>
         <div class="modal-body">
           <div class="setup-section">
-            <label for="compNameInput">Treasure Hunt Name:</label>
+            <label for="compNameInput">Competition Name:</label>
             <input
               type="text"
               id="compNameInput"
-              placeholder="e.g., DEEP SEA TREASURE HUNT"
-              value="DEEP SEA TREASURE HUNT"
+              placeholder="e.g., CARP LIFE MYSTERY BOX"
+              value="CARP LIFE MYSTERY BOX"
             />
           </div>
 
           <div class="setup-section">
-            <label for="compDateInput">Dive Date:</label>
+            <label for="compDateInput">Competition Date:</label>
             <input
               type="text"
               id="compDateInput"
@@ -94,16 +94,16 @@
           </div>
 
           <div class="setup-section">
-            <label for="boxesPerPage">Chests Per Zone:</label>
+            <label for="boxesPerPage">Boxes Per Page:</label>
             <select id="boxesPerPage">
-              <option value="20">20 chests</option>
-              <option value="25">25 chests</option>
-              <option value="30">30 chests</option>
+              <option value="20">20 boxes</option>
+              <option value="25">25 boxes</option>
+              <option value="30">30 boxes</option>
             </select>
           </div>
 
           <div class="setup-section">
-            <label for="csvUpload">Upload Treasure CSV:</label>
+            <label for="csvUpload">Upload Prize CSV:</label>
             <input type="file" id="csvUpload" accept=".csv" />
             <p class="help-text">
               CSV should have columns: prize_name, prize_value
@@ -117,7 +117,7 @@
             </label>
           </div>
 
-          <button class="primary-btn" id="saveSetup">START DIVING</button>
+          <button class="primary-btn" id="saveSetup">SAVE & START</button>
         </div>
       </div>
     </div>
@@ -126,17 +126,17 @@
     <div class="modal" id="prizeListModal">
       <div class="modal-content prize-list-modal">
         <div class="modal-header">
-          <h2>🐠 Treasure Map & Transparency</h2>
+          <h2>📋 Prize List & Transparency</h2>
           <button class="close-btn" data-modal="prizeListModal">✕</button>
         </div>
         <div class="modal-body">
           <div class="prize-stats">
             <div class="stat-box">
-              <span class="stat-label">Total Treasures</span>
+              <span class="stat-label">Total Prizes</span>
               <span class="stat-value" id="totalPrizes">0</span>
             </div>
             <div class="stat-box">
-              <span class="stat-label">Discovered</span>
+              <span class="stat-label">Claimed</span>
               <span class="stat-value claimed" id="claimedPrizes">0</span>
             </div>
             <div class="stat-box">
@@ -153,21 +153,21 @@
     <div class="modal prize-reveal-modal" id="prizeRevealModal">
       <div class="modal-content reveal-content">
         <div class="reveal-animation">
-          <div class="prize-icon-reveal" id="prizeIcon">💎</div>
+          <div class="prize-icon-reveal" id="prizeIcon">
+            <img src="./images/gift-box.png" alt="Prize" />
+          </div>
           <div class="prize-details">
-            <h3 class="prize-name" id="prizeName">GRAND TREASURE!</h3>
+            <h3 class="prize-name" id="prizeName">GRAND PRIZE!</h3>
             <div class="prize-value" id="prizeValue">£500</div>
             <div class="box-number-reveal">
-              Chest #<span id="revealBoxNumber">1</span>
+              Box #<span id="revealBoxNumber">1</span>
             </div>
           </div>
-          <button class="close-reveal-btn" id="closeReveal">
-            CONTINUE DIVING
-          </button>
+          <button class="close-reveal-btn" id="closeReveal">CONTINUE</button>
         </div>
       </div>
     </div>
 
-    <script src="underwater-game.js"></script>
+    <script src="game.js"></script>
   </body>
 </html>
