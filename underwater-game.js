@@ -706,7 +706,7 @@ class CarpFishingPrizeDraw {
   }
 
   spawnFish() {
-    const fishTypes = ["🐟", "🐠", "🐡", "🌿", "🍃"];
+    const fishTypes = ["🐟", "🐠", "🐡", "🍃"];
     const maxFish = 3;
     let activeFish = 0;
 
@@ -718,7 +718,7 @@ class CarpFishingPrizeDraw {
       fish.className = "swimming-fish";
 
       const goingRight = Math.random() > 0.5;
-      fish.classList.add(goingRight ? "left-to-right" : "right-to-left");
+      fish.classList.add(goingRight ? "right-to-left" : "left-to-right");
 
       fish.textContent =
         fishTypes[Math.floor(Math.random() * fishTypes.length)];
