@@ -1,12 +1,12 @@
 // ============================================
-// UNDERWATER TREASURE HUNT GAME - ENHANCED WITH BUBBLE SHOW
+// CARP FISHING COMPETITION - PRIZE DRAW GAME
 // ============================================
 
-class UnderwaterTreasureGame {
+class CarpFishingPrizeDraw {
   constructor() {
     // Game state
     this.prizes = [];
-    this.boxMappings = new Map(); // box number -> prize
+    this.boxMappings = new Map(); // peg number -> prize
     this.openedBoxes = new Set();
     this.currentPage = 1;
     this.totalBoxes = 100;
@@ -15,7 +15,7 @@ class UnderwaterTreasureGame {
     // Settings
     this.suspenseDuration = 2000; // ms
     this.soundEnabled = true;
-    this.competitionName = "DEEP SEA TREASURE HUNT";
+    this.competitionName = "CARP FISHING COMPETITION";
     this.competitionDate = this.formatDate(new Date());
 
     // Audio context for sound effects
@@ -90,7 +90,7 @@ class UnderwaterTreasureGame {
     document.getElementById("resetBtn").addEventListener("click", () => {
       if (
         confirm(
-          "Are you sure you want to reset the entire dive? This will close all opened treasure chests."
+          "Are you sure you want to reset the entire draw? This will reset all revealed prizes."
         )
       ) {
         this.resetGame();
@@ -121,28 +121,28 @@ class UnderwaterTreasureGame {
   }
 
   loadDefaultPrizes() {
-    // Default fishing-themed prize set
+    // Default carp fishing prize set
     this.prizes = [
-      { name: "Premium Fishing Rod", value: "£250" },
-      { name: "Deluxe Tackle Box", value: "£150" },
-      { name: "Live Bait Station", value: "£50" },
-      { name: "Fishing Kayak", value: "£400" },
-      { name: "Fish Finder GPS", value: "£200" },
-      { name: "Landing Net Pro", value: "£75" },
-      { name: "Cooler & Storage", value: "£80" },
-      { name: "Fishing License Bundle", value: "£30" },
-      { name: "Boat Rental Voucher", value: "£500" },
-      { name: "Lure Collection", value: "£120" },
+      { name: "Nash Scope Carp Rod", value: "£350" },
+      { name: "Shimano Big Baitrunner Reel", value: "£250" },
+      { name: "Fox EOS Bivvy", value: "£400" },
+      { name: "Sonik SK-TEK Bedchair", value: "£180" },
+      { name: "Delkim TXi Plus Alarms", value: "£300" },
+      { name: "Trakker Barrow", value: "£220" },
+      { name: "Mainline Cell Boilies Bundle", value: "£75" },
+      { name: "ESP Carp Tackle Box", value: "£120" },
+      { name: "Gardner PVA Mega Bundle", value: "£50" },
+      { name: "Korda Underwater Camera", value: "£180" },
     ];
 
     // Pad with smaller prizes to reach 100
     while (this.prizes.length < this.totalBoxes) {
       const smallPrizes = [
-        { name: "£10 Tackle Voucher", value: "£10" },
-        { name: "£20 Bait Voucher", value: "£20" },
-        { name: "£5 Hook Pack", value: "£5" },
-        { name: "Fishing Line Spool", value: "£15" },
-        { name: "Sinker Weight Set", value: "£12" },
+        { name: "£10 Bait Voucher", value: "£10" },
+        { name: "£20 Tackle Voucher", value: "£20" },
+        { name: "Korda Rig Kit", value: "£15" },
+        { name: "Pop-Up Selection", value: "£12" },
+        { name: "PVA Mesh Bundle", value: "£8" },
       ];
       this.prizes.push(
         smallPrizes[Math.floor(Math.random() * smallPrizes.length)]
@@ -208,9 +208,9 @@ class UnderwaterTreasureGame {
       this.prizes = prizes;
       this.totalBoxes = prizes.length;
       this.randomizeBoxMappings();
-      alert(`Successfully loaded ${prizes.length} treasures from CSV!`);
+      alert(`Successfully loaded ${prizes.length} prizes from CSV!`);
     } else {
-      alert("No valid treasures found in CSV. Please check the format.");
+      alert("No valid prizes found in CSV. Please check the format.");
     }
   }
 
@@ -285,16 +285,20 @@ class UnderwaterTreasureGame {
       box.classList.add("locked");
     }
 
-    // Use treasure chest images: closed for unopened, open for opened
+    // Use prize images: closed for unopened, open for opened
     const chestImg = this.openedBoxes.has(boxNum)
-      ? '<img src="./images/treasure-open.png" alt="Opened Treasure">'
-      : '<img src="./images/treasure-closed.png" alt="Treasure Chest">';
+      ? '<img src="./images/openedOyster.png" alt="Prize Revealed">'
+      : '<img src="./images/closedOyster.png" alt="Mystery Prize">';
 
     box.innerHTML = `
             <div class="box-content">
                 <div class="box-number">${boxNum}</div>
                 <div class="box-icon">${chestImg}</div>
-                ${this.openedBoxes.has(boxNum) ? '<div class="box-label">OPENED</div>' : ''}
+                ${
+                  this.openedBoxes.has(boxNum)
+                    ? '<div class="box-label">OPENED</div>'
+                    : ""
+                }
             </div>
         `;
 
@@ -352,7 +356,7 @@ class UnderwaterTreasureGame {
     const prize = this.boxMappings.get(boxNum);
 
     if (!prize) {
-      console.error("No treasure mapped to chest", boxNum);
+      console.error("No prize mapped to peg", boxNum);
       this.isAnimating = false;
       return;
     }
@@ -375,7 +379,8 @@ class UnderwaterTreasureGame {
     const rect = boxElement.getBoundingClientRect();
     const clone = document.createElement("div");
     clone.className = "box-clone";
-    clone.innerHTML = '<img src="./images/treasure-closed.png" alt="Treasure Chest">';
+    clone.innerHTML =
+      '<img src="./images/closedOyster.png" alt="Mystery Prize">';
     clone.style.left = rect.left + "px";
     clone.style.top = rect.top + "px";
     clone.style.width = rect.width + "px";
@@ -393,8 +398,9 @@ class UnderwaterTreasureGame {
     // Wait for fly-to-center transition
     await this.delay(600);
 
-    // Swap image to open chest with pop effect
-    clone.innerHTML = '<img src="./images/treasure-open.png" alt="Opened Treasure">';
+    // Swap image to revealed prize with pop effect
+    clone.innerHTML =
+      '<img src="./images/openedOyster.png" alt="Prize Revealed">';
     clone.classList.add("opened");
 
     // Brief pause to show the opened chest in the spotlight
@@ -410,11 +416,12 @@ class UnderwaterTreasureGame {
     // Reveal prize
     this.showPrizeReveal(boxNum, prize);
 
-    // Lock the original box and swap to open treasure chest image
+    // Lock the original box and swap to revealed prize image
     boxElement.classList.add("locked");
     const iconEl = boxElement.querySelector(".box-icon");
     if (iconEl) {
-      iconEl.innerHTML = '<img src="./images/treasure-open.png" alt="Opened Treasure">';
+      iconEl.innerHTML =
+        '<img src="./images/openedOyster.png" alt="Prize Revealed">';
     }
     boxElement.style.visibility = "visible";
 
@@ -443,11 +450,11 @@ class UnderwaterTreasureGame {
       this.playRevealSound();
     }
 
-    // EPIC UNDERWATER LIGHT SHOW + BUBBLES
+    // Celebration effects
     this.createLightShow();
     this.createEnhancedBubbles();
 
-    // Add floating bubbles around the modal
+    // Add floating particles around the modal
     this.createModalBubbles();
 
     // Update prize list
@@ -459,44 +466,44 @@ class UnderwaterTreasureGame {
     const name = prize.name.toLowerCase();
 
     if (
-      value.includes("500") ||
-      name.includes("grand") ||
-      name.includes("boat")
+      value.includes("400") ||
+      value.includes("350") ||
+      name.includes("bivvy")
     )
       return "🏆";
-    if (value.includes("400") || name.includes("kayak")) return "🚣";
+    if (value.includes("300") || name.includes("alarm")) return "🔔";
     if (value.includes("250") || value.includes("200")) return "🎣";
     if (name.includes("rod") || name.includes("reel")) return "🎣";
-    if (name.includes("fish")) return "🐟";
-    if (name.includes("tackle") || name.includes("lure")) return "🪝";
-    if (value.includes("voucher")) return "🎟️";
-    return "💎";
+    if (name.includes("bedchair") || name.includes("barrow")) return "🛏️";
+    if (name.includes("bait") || name.includes("boilie")) return "🐟";
+    if (name.includes("tackle") || name.includes("rig")) return "🪝";
+    if (name.includes("voucher")) return "🎟️";
+    if (name.includes("camera")) return "📷";
+    return "🐟";
   }
 
   // ============================================
-  // EPIC UNDERWATER LIGHT SHOW EFFECTS
+  // CELEBRATION LIGHT SHOW EFFECTS
+  // PERF + CAMERA FIX: colors muted, counts reduced
   // ============================================
   createLightShow() {
-    // Central burst explosion with ocean colors
     this.createLightBurst();
-
-    // Radial light rays
     this.createLightRays();
-
-    // Pulsing lights around screen
     this.createPulsingLights();
   }
 
   createLightBurst() {
+    // CAMERA FIX: muted greens/blues, no bright gold bursts
     const colors = [
-      "rgba(255, 215, 0, 0.8)", // Gold
-      "rgba(0, 212, 170, 0.8)", // Aqua Teal
-      "rgba(0, 102, 204, 0.8)", // Ocean Blue
-      "rgba(32, 178, 170, 0.8)", // Sea Green
-      "rgba(255, 107, 157, 0.8)", // Coral Pink
+      "rgba(93, 138, 102, 0.45)",
+      "rgba(45, 90, 123, 0.4)",
+      "rgba(61, 107, 79, 0.4)",
+      "rgba(74, 124, 89, 0.35)",
+      "rgba(45, 90, 123, 0.35)",
     ];
 
-    for (let i = 0; i < 5; i++) {
+    // Reduced from 5 staggered to 3
+    for (let i = 0; i < 3; i++) {
       setTimeout(() => {
         const burst = document.createElement("div");
         burst.className = "light-burst";
@@ -506,36 +513,32 @@ class UnderwaterTreasureGame {
         burst.style.background = `radial-gradient(circle, ${
           colors[i % colors.length]
         } 0%, transparent 70%)`;
-        burst.style.animationDelay = `${i * 0.1}s`;
 
         document.body.appendChild(burst);
-
         setTimeout(() => burst.remove(), 1500);
-      }, i * 100);
+      }, i * 150);
     }
   }
 
   createLightRays() {
+    // CAMERA FIX: muted colors, reduced from 24 to 16 rays
     const colors = [
-      "rgba(255, 215, 0, 0.6)",
-      "rgba(0, 212, 170, 0.6)",
-      "rgba(0, 102, 204, 0.6)",
-      "rgba(32, 178, 170, 0.6)",
-      "rgba(255, 107, 157, 0.6)",
+      "rgba(93, 138, 102, 0.35)",
+      "rgba(45, 90, 123, 0.3)",
+      "rgba(61, 107, 79, 0.3)",
+      "rgba(74, 124, 89, 0.28)",
     ];
 
-    // Create 24 rays in a circle
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < 16; i++) {
       const ray = document.createElement("div");
       ray.className = "light-ray";
       ray.style.background = `linear-gradient(to bottom, ${
         colors[i % colors.length]
       }, transparent)`;
-      ray.style.transform = `translate(-50%, -50%) rotate(${i * 15}deg)`;
-      ray.style.animationDelay = `${i * 0.02}s`;
+      ray.style.transform = `translate(-50%, -50%) rotate(${i * 22.5}deg)`;
+      ray.style.animationDelay = `${i * 0.025}s`;
 
       document.body.appendChild(ray);
-
       setTimeout(() => ray.remove(), 1200);
     }
   }
@@ -548,15 +551,14 @@ class UnderwaterTreasureGame {
       { x: "90%", y: "80%" },
       { x: "50%", y: "10%" },
       { x: "50%", y: "90%" },
-      { x: "20%", y: "50%" },
-      { x: "80%", y: "50%" },
     ];
 
+    // CAMERA FIX: very muted greens only, no gold
     const colors = [
-      "rgba(255, 215, 0, 0.5)",
-      "rgba(0, 212, 170, 0.5)",
-      "rgba(0, 102, 204, 0.5)",
-      "rgba(32, 178, 170, 0.5)",
+      "rgba(93, 138, 102, 0.25)",
+      "rgba(45, 90, 123, 0.22)",
+      "rgba(61, 107, 79, 0.2)",
+      "rgba(74, 124, 89, 0.2)",
     ];
 
     positions.forEach((pos, index) => {
@@ -565,8 +567,8 @@ class UnderwaterTreasureGame {
         light.style.position = "fixed";
         light.style.left = pos.x;
         light.style.top = pos.y;
-        light.style.width = "150px";
-        light.style.height = "150px";
+        light.style.width = "120px";
+        light.style.height = "120px";
         light.style.borderRadius = "50%";
         light.style.background = `radial-gradient(circle, ${
           colors[index % colors.length]
@@ -577,72 +579,67 @@ class UnderwaterTreasureGame {
         light.style.animation = "burstExpand 1.5s ease-out forwards";
 
         document.body.appendChild(light);
-
         setTimeout(() => light.remove(), 1600);
-      }, index * 80);
+      }, index * 100);
     });
   }
 
   // ============================================
-  // ENHANCED BUBBLE EFFECTS (instead of confetti)
+  // CELEBRATION PARTICLE EFFECTS
+  // PERF FIX: 150 → 55 bubbles
   // ============================================
   createEnhancedBubbles() {
-    // Create 150 bubble pieces for intense underwater effect
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 55; i++) {
       setTimeout(() => {
         const bubble = document.createElement("div");
         bubble.className = "bubble";
 
-        const size = 8 + Math.random() * 25;
+        const size = 8 + Math.random() * 22;
 
         bubble.style.left = Math.random() * 100 + "vw";
         bubble.style.bottom = "-30px";
         bubble.style.width = size + "px";
         bubble.style.height = size + "px";
 
-        // Random sway for bubble movement
-        const sway = (Math.random() - 0.5) * 150;
+        const sway = (Math.random() - 0.5) * 120;
         bubble.style.setProperty("--sway", sway + "px");
 
-        // Random rise speed
         const duration = 3 + Math.random() * 4;
         bubble.style.animation = `bubbleRise ${duration}s ease-out forwards`;
 
-        // Add some extra shine to certain bubbles
-        if (Math.random() > 0.7) {
-          bubble.style.boxShadow = `inset 0 0 15px rgba(255, 255, 255, 0.7),
-                                       0 0 25px rgba(0, 212, 170, 0.5)`;
+        // Subtle shine on some — kept moderate
+        if (Math.random() > 0.75) {
+          bubble.style.boxShadow = `inset 0 0 10px rgba(255, 255, 255, 0.5),
+                                       0 0 16px rgba(93, 138, 102, 0.3)`;
         }
 
         document.body.appendChild(bubble);
-
         setTimeout(() => bubble.remove(), duration * 1000 + 500);
-      }, i * 12); // Faster spawn rate
+      }, i * 18);
     }
   }
 
   // ============================================
-  // FLOATING BUBBLES AROUND MODAL
+  // FLOATING PARTICLES AROUND MODAL
+  // PERF FIX: 40 → 20 modal bubbles, 25 → 12 floaters
   // ============================================
   createModalBubbles() {
     const modal = document.querySelector(".prize-reveal-modal .modal-content");
     if (!modal) return;
 
-    // Create 40 floating bubble particles
-    for (let i = 0; i < 40; i++) {
+    // 20 orbit particles (was 40)
+    for (let i = 0; i < 20; i++) {
       setTimeout(() => {
         const bubble = document.createElement("div");
         bubble.className = "modal-bubble";
 
-        const size = 10 + Math.random() * 15;
+        const size = 10 + Math.random() * 14;
         bubble.style.width = size + "px";
         bubble.style.height = size + "px";
 
-        // Position at center of modal
         bubble.style.left = "50%";
         bubble.style.top = "50%";
 
-        // Random orbit parameters
         const duration = 4 + Math.random() * 3;
         const delay = Math.random() * 2;
 
@@ -650,42 +647,35 @@ class UnderwaterTreasureGame {
 
         modal.appendChild(bubble);
 
-        // Clean up when modal closes
-        const removeBubble = () => {
-          if (bubble.parentNode) {
-            bubble.remove();
-          }
-        };
-
-        // Set timeout to clean up after a while
-        setTimeout(removeBubble, 30000);
-      }, i * 120);
+        setTimeout(() => {
+          if (bubble.parentNode) bubble.remove();
+        }, 25000);
+      }, i * 150);
     }
 
-    // Add continuous floating particles inside modal
+    // 12 floating inner particles (was 25)
     this.createFloatingParticles(modal);
   }
 
   createFloatingParticles(modal) {
     const colors = [
-      "rgba(255, 255, 255, 0.5)",
-      "rgba(0, 212, 170, 0.4)",
-      "rgba(255, 215, 0, 0.4)",
-      "rgba(0, 102, 204, 0.4)",
-      "rgba(240, 248, 255, 0.5)",
+      "rgba(255, 255, 255, 0.4)",
+      "rgba(93, 138, 102, 0.3)",
+      "rgba(212, 160, 18, 0.25)",
+      "rgba(45, 90, 123, 0.3)",
+      "rgba(245, 240, 225, 0.35)",
     ];
 
-    // Create 25 floating particles
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 12; i++) {
       setTimeout(() => {
         const particle = document.createElement("div");
         particle.style.position = "absolute";
-        const size = 5 + Math.random() * 8;
+        const size = 5 + Math.random() * 7;
         particle.style.width = size + "px";
         particle.style.height = size + "px";
         particle.style.borderRadius = "50%";
         particle.style.background = `radial-gradient(circle at 30% 30%, 
-            rgba(255, 255, 255, 0.8), ${
+            rgba(255, 255, 255, 0.6), ${
               colors[Math.floor(Math.random() * colors.length)]
             })`;
         particle.style.left = Math.random() * 100 + "%";
@@ -695,22 +685,20 @@ class UnderwaterTreasureGame {
           3 + Math.random() * 2
         }s ease-in-out infinite`;
         particle.style.animationDelay = Math.random() * 2 + "s";
-        particle.style.boxShadow = `inset 0 0 5px rgba(255, 255, 255, 0.6)`;
+        particle.style.boxShadow = `inset 0 0 4px rgba(255, 255, 255, 0.4)`;
         particle.style.zIndex = "50";
 
         modal.appendChild(particle);
 
         setTimeout(() => {
-          if (particle.parentNode) {
-            particle.remove();
-          }
-        }, 30000);
-      }, i * 180);
+          if (particle.parentNode) particle.remove();
+        }, 25000);
+      }, i * 200);
     }
   }
 
   // ============================================
-  // ANIMATED SINE WAVE BACKGROUND
+  // ANIMATED WATER WAVE BACKGROUND
   // ============================================
   createOceanLife() {
     this.createSineWaves();
@@ -718,7 +706,7 @@ class UnderwaterTreasureGame {
   }
 
   spawnFish() {
-    const fishTypes = ["🐟", "🐠", "🐡", "🦈", "🐙", "🦑", "🦐", "🐚"];
+    const fishTypes = ["🐟", "🐠", "🐡", "🌿", "🍃"];
     const maxFish = 3;
     let activeFish = 0;
 
@@ -732,20 +720,19 @@ class UnderwaterTreasureGame {
       const goingRight = Math.random() > 0.5;
       fish.classList.add(goingRight ? "left-to-right" : "right-to-left");
 
-      fish.textContent = fishTypes[Math.floor(Math.random() * fishTypes.length)];
-      fish.style.top = (10 + Math.random() * 80) + "vh";
-      fish.style.fontSize = (1 + Math.random() * 1.5) + "rem";
+      fish.textContent =
+        fishTypes[Math.floor(Math.random() * fishTypes.length)];
+      fish.style.top = 10 + Math.random() * 80 + "vh";
+      fish.style.fontSize = 1 + Math.random() * 1.5 + "rem";
       fish.style.opacity = 0.3 + Math.random() * 0.4;
 
       const duration = 18 + Math.random() * 22;
       fish.style.animationDuration = duration + "s";
       fish.style.animationDelay = (initialDelay || 0) + "s";
 
-      // Remove from DOM when animation ends, then spawn a replacement
       fish.addEventListener("animationend", () => {
         fish.remove();
         activeFish--;
-        // Spawn a replacement after a random pause
         setTimeout(() => createFish(0), 2000 + Math.random() * 6000);
       });
 
@@ -765,8 +752,20 @@ class UnderwaterTreasureGame {
     const ctx = canvas.getContext("2d");
 
     const waves = [
-      { amplitude: 28, frequency: 0.007, speed: 0.0012, color: "rgba(0, 102, 204, 0.4)", lineWidth: 2 },
-      { amplitude: 35, frequency: 0.005, speed: 0.0008, color: "rgba(0, 60, 120, 0.25)", lineWidth: 2.5 },
+      {
+        amplitude: 28,
+        frequency: 0.007,
+        speed: 0.0012,
+        color: "rgba(45, 90, 123, 0.4)",
+        lineWidth: 2,
+      },
+      {
+        amplitude: 35,
+        frequency: 0.005,
+        speed: 0.0008,
+        color: "rgba(26, 58, 74, 0.25)",
+        lineWidth: 2.5,
+      },
     ];
 
     let lastTime = 0;
@@ -786,7 +785,6 @@ class UnderwaterTreasureGame {
       if (!lastTime) lastTime = timestamp;
       const delta = timestamp - lastTime;
 
-      // Throttle to ~30fps — waves are slow, 60fps is unnecessary
       if (delta < frameInterval) return;
 
       lastTime = timestamp;
@@ -805,7 +803,10 @@ class UnderwaterTreasureGame {
         ctx.lineWidth = wave.lineWidth;
 
         for (let x = 0; x <= canvas.width; x += step) {
-          const y = baseY + Math.sin(x * wave.frequency + elapsed * wave.speed) * wave.amplitude;
+          const y =
+            baseY +
+            Math.sin(x * wave.frequency + elapsed * wave.speed) *
+              wave.amplitude;
           if (x === 0) {
             ctx.moveTo(x, y);
           } else {
@@ -858,7 +859,7 @@ class UnderwaterTreasureGame {
 
   resetGame() {
     this.openedBoxes.clear();
-    this.randomizeBoxMappings(); // Re-randomize for fairness
+    this.randomizeBoxMappings();
     this.currentPage = 1;
     this.renderCurrentPage();
     this.updatePrizeList();
@@ -888,7 +889,6 @@ class UnderwaterTreasureGame {
   }
 
   playSuspenseSound() {
-    // Underwater diving/bubbling tension sound
     for (let i = 0; i < 20; i++) {
       setTimeout(() => {
         this.playTone(150 + i * 30, 0.1, "sine", 0.2);
@@ -897,7 +897,6 @@ class UnderwaterTreasureGame {
   }
 
   playRevealSound() {
-    // Treasure discovery fanfare (ocean themed)
     this.playTone(523.25, 0.2, "sine", 0.4); // C
     setTimeout(() => this.playTone(659.25, 0.2, "sine", 0.4), 100); // E
     setTimeout(() => this.playTone(783.99, 0.2, "sine", 0.4), 200); // G
@@ -980,5 +979,5 @@ class UnderwaterTreasureGame {
 
 // Initialize game when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-  window.game = new UnderwaterTreasureGame();
+  window.game = new CarpFishingPrizeDraw();
 });
