@@ -52,6 +52,36 @@ class CarpFishingPrizeDraw {
   }
 
   setupEventListeners() {
+    // Intercept keyboard reload shortcuts (F5, Ctrl+R, Cmd+R) to show custom modal
+    const game = this;
+    window.addEventListener("keydown", function (e) {
+      const isReload = e.key === "F5" ||
+        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r");
+
+      if (isReload && game.openedBoxes.size > 0) {
+        e.preventDefault();
+        game.showConfirm({
+          icon: "🔄",
+          title: "Reload Page?",
+          message: `You have ${game.openedBoxes.size} revealed prize(s). Reloading will lose all progress.`,
+          confirmText: "Reload",
+          cancelText: "Stay",
+          onConfirm: () => {
+            window.location.reload();
+          },
+        });
+      }
+    });
+
+    // Fallback for browser refresh button / closing tab (native dialog - can't be customized)
+    window.addEventListener("beforeunload", function (e) {
+      if (game.openedBoxes.size > 0) {
+        e.preventDefault();
+        e.returnValue = "";
+        return "";
+      }
+    });
+
     // Header buttons
     document.getElementById("prizeListBtn").addEventListener("click", () => {
       this.updatePrizeList();
@@ -88,13 +118,17 @@ class CarpFishingPrizeDraw {
 
     // Reset button
     document.getElementById("resetBtn").addEventListener("click", () => {
-      if (
-        confirm(
-          "Are you sure you want to reset the entire draw? This will reset all revealed prizes."
-        )
-      ) {
-        this.resetGame();
+      if (this.openedBoxes.size === 0) {
+        this.showToast("No progress to reset.", "info");
+        return;
       }
+      this.showConfirm({
+        icon: "⚠️",
+        title: "Reset Draw?",
+        message: `Are you sure you want to reset? This will clear all ${this.openedBoxes.size} revealed prize(s) and cannot be undone.`,
+        confirmText: "Reset",
+        onConfirm: () => this.resetGame(),
+      });
     });
 
     // Prize reveal close
@@ -208,9 +242,9 @@ class CarpFishingPrizeDraw {
       this.prizes = prizes;
       this.totalBoxes = prizes.length;
       this.randomizeBoxMappings();
-      alert(`Successfully loaded ${prizes.length} prizes from CSV!`);
+      this.showToast(`Successfully loaded ${prizes.length} prizes from CSV!`, "success");
     } else {
-      alert("No valid prizes found in CSV. Please check the format.");
+      this.showToast("No valid prizes found in CSV. Please check the format.", "error");
     }
   }
 
@@ -973,6 +1007,87 @@ class CarpFishingPrizeDraw {
         return "rd";
       default:
         return "th";
+    }
+  }
+
+  showConfirm({ icon = "⚠️", title, message, confirmText = "Confirm", cancelText = "Cancel", onConfirm, onCancel, isDanger = true }) {
+    const modal = document.getElementById("confirmModal");
+    const iconEl = document.getElementById("confirmIcon");
+    const titleEl = document.getElementById("confirmTitle");
+    const messageEl = document.getElementById("confirmMessage");
+    const confirmBtn = document.getElementById("confirmOk");
+    const cancelBtn = document.getElementById("confirmCancel");
+
+    iconEl.textContent = icon;
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    confirmBtn.textContent = confirmText;
+    cancelBtn.textContent = cancelText;
+
+    // Style the confirm button
+    if (isDanger) {
+      confirmBtn.classList.remove("confirm-ok-success");
+    } else {
+      confirmBtn.classList.add("confirm-ok-success");
+    }
+
+    this.showModal("confirmModal");
+
+    // Clean up old listeners
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    const newCancelBtn = cancelBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+    newConfirmBtn.addEventListener("click", () => {
+      this.hideModal("confirmModal");
+      if (onConfirm) onConfirm();
+    });
+
+    newCancelBtn.addEventListener("click", () => {
+      this.hideModal("confirmModal");
+      if (onCancel) onCancel();
+    });
+  }
+
+  showToast(message, type = "info", duration = 4000) {
+    const container = document.getElementById("toastContainer");
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+
+    const icons = {
+      success: "✓",
+      error: "✕",
+      info: "ℹ",
+    };
+
+    const titles = {
+      success: "Success",
+      error: "Error",
+      info: "Notice",
+    };
+
+    toast.innerHTML = `
+      <div class="toast-icon">${icons[type] || icons.info}</div>
+      <div class="toast-content">
+        <div class="toast-title">${titles[type] || titles.info}</div>
+        <div class="toast-message">${message}</div>
+      </div>
+      <button class="toast-close">×</button>
+    `;
+
+    const closeBtn = toast.querySelector(".toast-close");
+    const removeToast = () => {
+      toast.classList.add("toast-exit");
+      setTimeout(() => toast.remove(), 300);
+    };
+
+    closeBtn.addEventListener("click", removeToast);
+
+    container.appendChild(toast);
+
+    if (duration > 0) {
+      setTimeout(removeToast, duration);
     }
   }
 }
