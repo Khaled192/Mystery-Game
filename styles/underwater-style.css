@@ -566,26 +566,43 @@ body::after {
   }
 }
 
-@keyframes boxOpenPop {
-  0% {
-    transform: scale(1);
-  }
-  30% {
-    transform: scale(1.35) rotate(-6deg);
-  }
-  55% {
-    transform: scale(0.9) rotate(4deg);
-  }
-  75% {
-    transform: scale(1.15) rotate(-2deg);
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-  }
+/* Dark backdrop spotlight for box opening */
+.box-clone-backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 26, 51, 0.4) 0%,
+    rgba(0, 13, 26, 0.92) 60%
+  );
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
 }
 
-.box-open-pop {
-  animation: boxOpenPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards !important;
+.box-clone-backdrop.active {
+  opacity: 1;
+}
+
+.box-clone-backdrop.fade-out {
+  opacity: 0;
+}
+
+/* Flying clone animation for box opening */
+.box-clone {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  transition:
+    left 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    top 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s ease;
+  filter: drop-shadow(0 0 30px rgba(212, 160, 18, 0.8));
+  will-change: transform;
 }
 
 .box-clone img {

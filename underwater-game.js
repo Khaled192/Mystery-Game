@@ -389,7 +389,6 @@ class CarpFishingPrizeDraw {
   }
 
   async openBox(boxNum, boxElement) {
-    // Prevent opening if already opened or animating
     if (this.openedBoxes.has(boxNum) || this.isAnimating) {
       return;
     }
@@ -403,7 +402,7 @@ class CarpFishingPrizeDraw {
       return;
     }
 
-    // Suspense phase — wobble the box in place
+    // Suspense phase
     boxElement.classList.add("suspense");
     if (this.soundEnabled) {
       this.playSuspenseSound();
@@ -412,34 +411,63 @@ class CarpFishingPrizeDraw {
     await this.delay(this.suspenseDuration);
     boxElement.classList.remove("suspense");
 
-    // Mark as opened and update box appearance immediately
-    this.openedBoxes.add(boxNum);
-    boxElement.classList.add("locked");
+    // Create dark backdrop
+    const backdrop = document.createElement("div");
+    backdrop.className = "box-clone-backdrop";
+    document.body.appendChild(backdrop);
 
-    // Swap to opened oyster image with a quick pop animation
+    // Create floating clone at box's current position
+    const rect = boxElement.getBoundingClientRect();
+    const clone = document.createElement("div");
+    clone.className = "box-clone";
+    clone.innerHTML =
+      '<img src="./images/closedOyster.png" alt="Mystery Prize">';
+    clone.style.left = rect.left + "px";
+    clone.style.top = rect.top + "px";
+    clone.style.width = rect.width + "px";
+    clone.style.height = rect.height + "px";
+    document.body.appendChild(clone);
+
+    // Hide original box during animation
+    boxElement.style.visibility = "hidden";
+
+    // Trigger reflow, then animate
+    clone.offsetHeight;
+    backdrop.classList.add("active");
+    clone.classList.add("centered");
+
+    // Wait for fly-to-center transition
+    await this.delay(600);
+
+    // Swap to opened image
+    clone.innerHTML =
+      '<img src="./images/openedOyster.png" alt="Prize Revealed">';
+    clone.classList.add("opened");
+
+    await this.delay(600);
+
+    // Fade out clone and backdrop
+    clone.classList.add("fade-out");
+    backdrop.classList.add("fade-out");
+
+    // Mark as opened
+    this.openedBoxes.add(boxNum);
+
+    // Show prize modal
+    this.showPrizeReveal(boxNum, prize);
+
+    // Update original box
+    boxElement.classList.add("locked");
     const iconEl = boxElement.querySelector(".box-icon");
     if (iconEl) {
-      iconEl.style.animation = "none";
       iconEl.innerHTML =
         '<img src="./images/openedOyster.png" alt="Prize Revealed">';
-      iconEl.classList.add("box-open-pop");
-      // Remove the pop class after animation completes
-      setTimeout(() => iconEl.classList.remove("box-open-pop"), 400);
     }
+    boxElement.style.visibility = "visible";
 
-    // Add OPENED label if not already there
-    if (!boxElement.querySelector(".box-label")) {
-      const label = document.createElement("div");
-      label.className = "box-label";
-      label.textContent = "OPENED";
-      boxElement.querySelector(".box-content").appendChild(label);
-    }
-
-    // Brief pause to show the opened state, then show prize modal
-    await this.delay(300);
-
-    // Show prize reveal modal
-    this.showPrizeReveal(boxNum, prize);
+    await this.delay(400);
+    clone.remove();
+    backdrop.remove();
 
     this.isAnimating = false;
   }
