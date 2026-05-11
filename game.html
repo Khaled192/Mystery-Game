@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,7 +10,99 @@
       href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./underwater-style.css" />
+
+    <link rel="stylesheet" href="./styles/underwater-style.css" />
+
+    <style>
+      /* Override header to be a single row: info | logo | controls */
+      .comp-header {
+        flex-direction: row !important;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px !important;
+        gap: 0 !important;
+      }
+
+      /* Logo centered */
+      .comp-logo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+      }
+
+      .comp-logo img {
+        max-height: 90px;
+        width: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 16px rgba(93, 138, 102, 0.5))
+          drop-shadow(0 0 32px rgba(45, 90, 123, 0.3));
+        transition: filter 0.3s ease;
+      }
+
+      .comp-logo img:hover {
+        filter: drop-shadow(0 4px 20px rgba(212, 160, 18, 0.6))
+          drop-shadow(0 0 40px rgba(93, 138, 102, 0.5));
+      }
+
+      /* Competition info — left side, compact */
+      .comp-info {
+        flex: 1;
+        text-align: left;
+      }
+
+      .comp-title {
+        font-size: 1.4rem !important;
+        letter-spacing: 2px !important;
+        animation: gradientFlow 10s ease infinite !important;
+        /* keep the gradient but smaller */
+        margin-bottom: 2px !important;
+      }
+
+      .comp-date {
+        font-size: 0.85rem !important;
+        letter-spacing: 1.5px !important;
+        color: var(--text-muted) !important;
+        text-shadow: none !important;
+      }
+
+      /* Controls stay on the right */
+      .header-controls {
+        flex: 1;
+        justify-content: flex-end;
+      }
+
+      @media (max-width: 768px) {
+        .comp-header {
+          flex-wrap: wrap;
+          gap: 8px !important;
+        }
+
+        .comp-logo {
+          order: 0;
+          width: 100%;
+          flex: unset;
+        }
+
+        .comp-logo img {
+          max-height: 60px;
+        }
+
+        .comp-info {
+          order: 1;
+          flex: 1;
+        }
+
+        .comp-title {
+          font-size: 1.1rem !important;
+        }
+
+        .header-controls {
+          order: 2;
+          flex: unset;
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- Competition Header -->
@@ -19,6 +111,15 @@
         <h1 class="comp-title" id="compTitle">CARP FISHING COMPETITION</h1>
         <p class="comp-date" id="compDate">COMPETITION DATE</p>
       </div>
+
+      <!-- Logo centered -->
+      <div class="comp-logo">
+        <img
+          src="./images/carp-logo.png"
+          alt="Carp Fishing Competitions Logo"
+        />
+      </div>
+
       <div class="header-controls">
         <button class="header-btn" id="prizeListBtn">🎣 PRIZE LIST</button>
         <button class="header-btn" id="settingsBtn">⚙️ SETUP</button>
@@ -177,9 +278,13 @@
       <div class="modal-content confirm-content">
         <div class="confirm-icon" id="confirmIcon">⚠️</div>
         <h3 class="confirm-title" id="confirmTitle">Are you sure?</h3>
-        <p class="confirm-message" id="confirmMessage">This action cannot be undone.</p>
+        <p class="confirm-message" id="confirmMessage">
+          This action cannot be undone.
+        </p>
         <div class="confirm-buttons">
-          <button class="confirm-btn confirm-cancel" id="confirmCancel">Cancel</button>
+          <button class="confirm-btn confirm-cancel" id="confirmCancel">
+            Cancel
+          </button>
           <button class="confirm-btn confirm-ok" id="confirmOk">Confirm</button>
         </div>
       </div>

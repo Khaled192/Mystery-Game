@@ -43,8 +43,9 @@ class CarpFishingPrizeDraw {
 
   setupAudio() {
     try {
-      this.audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)();
+      this.audioContext = new (
+        window.AudioContext || window.webkitAudioContext
+      )();
     } catch (e) {
       console.warn("Audio not supported");
       this.soundEnabled = false;
@@ -55,7 +56,8 @@ class CarpFishingPrizeDraw {
     // Intercept keyboard reload shortcuts (F5, Ctrl+R, Cmd+R) to show custom modal
     const game = this;
     window.addEventListener("keydown", function (e) {
-      const isReload = e.key === "F5" ||
+      const isReload =
+        e.key === "F5" ||
         ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r");
 
       if (isReload && game.openedBoxes.size > 0) {
@@ -179,7 +181,7 @@ class CarpFishingPrizeDraw {
         { name: "PVA Mesh Bundle", value: "£8" },
       ];
       this.prizes.push(
-        smallPrizes[Math.floor(Math.random() * smallPrizes.length)]
+        smallPrizes[Math.floor(Math.random() * smallPrizes.length)],
       );
     }
 
@@ -242,9 +244,15 @@ class CarpFishingPrizeDraw {
       this.prizes = prizes;
       this.totalBoxes = prizes.length;
       this.randomizeBoxMappings();
-      this.showToast(`Successfully loaded ${prizes.length} prizes from CSV!`, "success");
+      this.showToast(
+        `Successfully loaded ${prizes.length} prizes from CSV!`,
+        "success",
+      );
     } else {
-      this.showToast("No valid prizes found in CSV. Please check the format.", "error");
+      this.showToast(
+        "No valid prizes found in CSV. Please check the format.",
+        "error",
+      );
     }
   }
 
@@ -375,7 +383,7 @@ class CarpFishingPrizeDraw {
     const totalPages = Math.ceil(this.totalBoxes / this.boxesPerPage);
     this.currentPage = Math.max(
       1,
-      Math.min(this.currentPage + direction, totalPages)
+      Math.min(this.currentPage + direction, totalPages),
     );
     this.renderCurrentPage();
   }
@@ -395,7 +403,7 @@ class CarpFishingPrizeDraw {
       return;
     }
 
-    // Suspense phase
+    // Suspense phase — wobble the box in place
     boxElement.classList.add("suspense");
     if (this.soundEnabled) {
       this.playSuspenseSound();
@@ -404,65 +412,34 @@ class CarpFishingPrizeDraw {
     await this.delay(this.suspenseDuration);
     boxElement.classList.remove("suspense");
 
-    // Create dark backdrop to focus attention on the chest
-    const backdrop = document.createElement("div");
-    backdrop.className = "box-clone-backdrop";
-    document.body.appendChild(backdrop);
-
-    // Create a floating clone of the box at its current position
-    const rect = boxElement.getBoundingClientRect();
-    const clone = document.createElement("div");
-    clone.className = "box-clone";
-    clone.innerHTML =
-      '<img src="./images/closedOyster.png" alt="Mystery Prize">';
-    clone.style.left = rect.left + "px";
-    clone.style.top = rect.top + "px";
-    clone.style.width = rect.width + "px";
-    clone.style.height = rect.height + "px";
-    document.body.appendChild(clone);
-
-    // Hide the original box during animation
-    boxElement.style.visibility = "hidden";
-
-    // Trigger reflow, then fade in backdrop and animate clone to center
-    clone.offsetHeight;
-    backdrop.classList.add("active");
-    clone.classList.add("centered");
-
-    // Wait for fly-to-center transition
-    await this.delay(600);
-
-    // Swap image to revealed prize with pop effect
-    clone.innerHTML =
-      '<img src="./images/openedOyster.png" alt="Prize Revealed">';
-    clone.classList.add("opened");
-
-    // Brief pause to show the opened chest in the spotlight
-    await this.delay(600);
-
-    // Fade out clone and backdrop, then show prize reveal
-    clone.classList.add("fade-out");
-    backdrop.classList.add("fade-out");
-
-    // Mark as opened
+    // Mark as opened and update box appearance immediately
     this.openedBoxes.add(boxNum);
-
-    // Reveal prize
-    this.showPrizeReveal(boxNum, prize);
-
-    // Lock the original box and swap to revealed prize image
     boxElement.classList.add("locked");
+
+    // Swap to opened oyster image with a quick pop animation
     const iconEl = boxElement.querySelector(".box-icon");
     if (iconEl) {
+      iconEl.style.animation = "none";
       iconEl.innerHTML =
         '<img src="./images/openedOyster.png" alt="Prize Revealed">';
+      iconEl.classList.add("box-open-pop");
+      // Remove the pop class after animation completes
+      setTimeout(() => iconEl.classList.remove("box-open-pop"), 400);
     }
-    boxElement.style.visibility = "visible";
 
-    // Remove clone and backdrop after fade completes
-    await this.delay(400);
-    clone.remove();
-    backdrop.remove();
+    // Add OPENED label if not already there
+    if (!boxElement.querySelector(".box-label")) {
+      const label = document.createElement("div");
+      label.className = "box-label";
+      label.textContent = "OPENED";
+      boxElement.querySelector(".box-content").appendChild(label);
+    }
+
+    // Brief pause to show the opened state, then show prize modal
+    await this.delay(300);
+
+    // Show prize reveal modal
+    this.showPrizeReveal(boxNum, prize);
 
     this.isAnimating = false;
   }
@@ -915,7 +892,7 @@ class CarpFishingPrizeDraw {
     gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(
       0.01,
-      this.audioContext.currentTime + duration
+      this.audioContext.currentTime + duration,
     );
 
     oscillator.start(this.audioContext.currentTime);
@@ -951,7 +928,7 @@ class CarpFishingPrizeDraw {
       const modalContent = modal.querySelector(".modal-content");
       if (modalContent) {
         const particles = modalContent.querySelectorAll(
-          '.modal-bubble, [style*="floatUpDown"]'
+          '.modal-bubble, [style*="floatUpDown"]',
         );
         particles.forEach((particle) => particle.remove());
       }
@@ -1010,7 +987,16 @@ class CarpFishingPrizeDraw {
     }
   }
 
-  showConfirm({ icon = "⚠️", title, message, confirmText = "Confirm", cancelText = "Cancel", onConfirm, onCancel, isDanger = true }) {
+  showConfirm({
+    icon = "⚠️",
+    title,
+    message,
+    confirmText = "Confirm",
+    cancelText = "Cancel",
+    onConfirm,
+    onCancel,
+    isDanger = true,
+  }) {
     const modal = document.getElementById("confirmModal");
     const iconEl = document.getElementById("confirmIcon");
     const titleEl = document.getElementById("confirmTitle");
