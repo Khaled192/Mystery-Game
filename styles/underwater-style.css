@@ -472,11 +472,6 @@ body::after {
   }
 }
 
-/* Single combined animation on idle boxes */
-.mystery-box:not(.locked):not(.opening):not(.suspense) .box-icon {
-  animation: treasureFloatBreath 4s ease-in-out infinite;
-}
-
 .box-label {
   font-size: 1.1rem;
   font-weight: 700;
